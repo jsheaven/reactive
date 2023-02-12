@@ -11,7 +11,7 @@
 - ✅ Makes `Function`s reactive so that they re-run when data in reactive objects they use, changes
 - ✅ Makes `Object`s reactive so that when values in them are changed, reactive `Functions` re-run
 - ✅ Available as a simple API
-- ✅ Just `362 byte` nano sized (ESM, gizpped)
+- ✅ Just `357 byte` nano sized (ESM, gizpped)
 - ✅ Tree-shakable and side-effect free
 - ✅ One `@jsheaeven` dependency: `@jsheaven/observed`
 - ✅ First class TypeScript support
