@@ -4,14 +4,14 @@
 
 <h2 align="center">User Stories</h2>
 
-1. As a developer, I (sometimes) want a function to be re-run when the data that it depends on, changes
+1. As a developer, I (sometimes) want a function to re-run when the data that it depends on, changes
 
 <h2 align="center">Features</h2>
 
 - ✅ Makes `Function`s reactive so that they re-run when data in reactive objects they use, changes
 - ✅ Makes `Object`s reactive so that when values in them are changed, reactive `Functions` re-run
 - ✅ Available as a simple API
-- ✅ Just `357 byte` nano sized (ESM, gizpped)
+- ✅ Just `397 byte` nano sized (ESM, gizpped)
 - ✅ Tree-shakable and side-effect free
 - ✅ One `@jsheaeven` dependency: `@jsheaven/observed`
 - ✅ First class TypeScript support

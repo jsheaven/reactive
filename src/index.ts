@@ -1,11 +1,12 @@
 import { observed, defineProp } from '@jsheaven/observed'
 
-const reactiveScopeSymbol = Symbol('reactiveScope')
+export const reactiveScopeSymbol = Symbol('reactiveScope')
 
 let currentReactiveFunctionScope: Function | undefined = undefined
 let currentReactiveGetScope: any = undefined
 
-export const on = (value: any) => {
+/** marks a value to be reactively dependent to the currently active reactive function scope */
+export const on = <T>(value: T): T => {
   if (typeof currentReactiveFunctionScope === 'undefined' || typeof currentReactiveGetScope === 'undefined')
     return value
 
@@ -18,7 +19,12 @@ export const on = (value: any) => {
   return value
 }
 
+/** turns functions into reactive functions, runs them and turns objects into reactive ones */
 export const reactive = <T>(value: T): T => {
+  if (typeof currentReactiveFunctionScope !== 'undefined') {
+    throw new Error("Don't use reactive() inside of reactive()")
+  }
+
   if (typeof value === 'function') {
     // set the current reactive scope for getter interceptors to track dependencies
     currentReactiveFunctionScope = value
@@ -39,43 +45,15 @@ export const reactive = <T>(value: T): T => {
         if (typeof currentReactiveFunctionScope === 'undefined') return
         currentReactiveGetScope = receiver
       },
-      /*
-      onGet: (prop, value, target, receiver) => {
-        if (typeof currentReactiveFunctionScope === 'undefined') return
-
-        // rewind after numb()
-
-        //if (_currentReactiveGetScope) {
-        //  currentReactiveGetScope = _currentReactiveGetScope
-        //  _currentReactiveGetScope = undefined
-        //}
-
-
-        if (currentReactiveGetScope === receiver) {
-          // if it's not  a x or y in a x.y.z access
-          // it's the x.y.z in an x.y.z access
-          defineProp(receiver, reactiveScopeSymbol, [
-            ...(Reflect.get(target, reactiveScopeSymbol, receiver) || []),
-            currentReactiveFunctionScope,
-          ])
-        }
-
-        // track the depth of an x.y.z access (recursively, this is deep)
-        currentReactiveGetScope = value
-      },
-      */
 
       onSet: (prop, value, valueBefore, receiver) => {
-        //if (!Array.isArray(receiver[reactiveScopeSymbol])) return
-        // re-run dependent (tracked) reactive functions
-        //receiver[reactiveScopeSymbol].forEach((fn) => fn())
         if (!Array.isArray(receiver[reactiveScopeSymbol])) return
         // re-run dependent (tracked) reactive functions
         receiver[reactiveScopeSymbol].forEach((fn) => fn())
       },
     })
   }
-  throw new Error('This datatype cannot be made reactive.')
+  throw new Error('This datatype cannot be turned reactive.')
 }
 
 export * from '@jsheaven/observed'

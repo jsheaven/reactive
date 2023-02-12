@@ -19,33 +19,32 @@ describe('reactive', () => {
   it('runs a reactive function as often as a reactive value that it [[get]]s, is changed', () => {
     const spy = jest.fn(() => {})
 
+    const myBar = reactive({ bar: { foo: { value: 'Y' } } })
+    const myBar2 = reactive({ bar2: { foo2: { value2: 'Y2' } } })
+
     reactive(() => {
-      const myBar = reactive({ bar: { foo: { value: 'Y' } } })
-      const myBar2 = reactive({ bar2: { foo2: { value2: 'Y2' } } })
+      console.log('reading myBar.bar', myBar.bar.foo.value)
 
-      reactive(() => {
-        console.log('reading myBar.bar', myBar.bar.foo.value)
-
-        // react on changes of this
-        console.log('reading myBar2.bar2', on(myBar2.bar2.foo2.value2))
-        spy()
-      })
-
-      myBar.bar.foo.value = 'X'
-      myBar.bar.foo.value = 'Z'
-
-      // here it is changed, so this will trigger a re-run
-      myBar2.bar2.foo2.value2 = 'Z'
+      // react on changes of this
+      console.log('reading myBar2.bar2', on(myBar2.bar2.foo2.value2))
+      spy()
     })
+
+    myBar.bar.foo.value = 'X'
+    myBar.bar.foo.value = 'Z'
+
+    // here it is changed, so this will trigger a re-run
+    myBar2.bar2.foo2.value2 = 'Z'
+
     expect(spy).toHaveBeenCalledTimes(2 /** initial call + one change */)
   })
 
   it('does not work with null', () => {
-    expect(() => reactive(null)).toThrowError('This datatype cannot be made reactive.')
+    expect(() => reactive(null)).toThrowError('This datatype cannot be turned reactive.')
   })
 
   it('does not work with non-object', () => {
-    expect(() => reactive([])).toThrowError('This datatype cannot be made reactive.')
+    expect(() => reactive([])).toThrowError('This datatype cannot be turned reactive.')
   })
 
   it('returns the input value when no reactive scope is set', () => {
@@ -59,7 +58,7 @@ describe('reactive', () => {
     const state = reactive({ rand: 0 })
     const otherState = reactive({ rand: 0 })
 
-    reactive(() => {
+    reactive(async () => {
       // using state.rand makes this function re-run when setInterval changes it
       console.log('Next random value', on(state.rand))
 
@@ -84,5 +83,13 @@ describe('reactive', () => {
         done()
       }
     }, 1)
+  })
+
+  it('throws an error when using reactivity inside of reactivity', () => {
+    expect(() => {
+      reactive(() => {
+        reactive(() => {})
+      })
+    }).toThrow("Don't use reactive() inside of reactive()")
   })
 })
